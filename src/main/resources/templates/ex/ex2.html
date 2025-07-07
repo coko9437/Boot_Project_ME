@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1> 서버로 부터 전달받은 데이터를 화면에서 사용하기.</h1>
+  <div th:text = "${list}"></div>
+  <div th:text = "${map}"></div>
+  <div th:text = "${dto}"></div>
+    <h2>[[...]] 표현식으로도 가능함.</h2>
+  [[${list}]]
+  [[${map}]]
+  [[${dto}]]
+
+    <h2>서버로 부터 전달받은 데이터를 자바스크립트 태그안에서 사용하기.</h2>
+  <script th:inline="javascript">
+    const list = [[${list}]]
+    const map = [[${map}]]
+    const dto = [[${dto}]]
+    // 위 컴파일러 오류 무시해도 상관없음.
+
+    console.log(list)
+    console.log(map)
+    console.log(dto)
+
+  </script>
+</body>
+</html>
