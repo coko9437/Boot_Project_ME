@@ -1,0 +1,69 @@
+250708
+
+### 스프링 부트
+ : 자동구성, 서버 내장, 독립 실행형임 (별도 웹서버 배포 없이도 ㅇ)
+
+### 타임리프 
+ : 프론트 화면그리기 도구
+-> 사용예시
+1) <html lang="ko" xmlns:th="www.thymeleaf.org">
+2) <th:block>
+	 타임리프 문법 사용하기.
+    </block>
+- 주석처리 : <!-- /* [[...]]  */-->
+
+- 변수선언 : <th:with = "변수명 ">
+	-> 예시) 선언 <th:with = "num1 = ${10}, num2 = ${20}">
+	            사용 <h3 th:text="${num1 + num2}"> </h3>
+
+### 엔티티 클래스
+ : 데이터베이스의 테이블과 1:1로 매핑되는 Java 클래스
+ 사용 예)
+CREATE TABLE todo (
+    id BIGINT PRIMARY KEY,
+    title VARCHAR(100),
+    due_date DATE,
+    finished BOOLEAN );
+===============
+@Entity  // 이 클래스는 DB 테이블과 연결된다는 표시
+@Table(name = "todo")  // 어떤 테이블과 연결되는지 명시 (생략 가능)
+public class Todo {
+
+    @Id  // 기본키
+    private Long id;
+
+    private String title;
+
+    @Column(name = "due_date")  // DB 컬럼 이름과 자바 변수명이 다르면 명시 필요
+    private LocalDate dueDate;
+
+    private boolean finished; }
+
+🆚 Entity vs DTO vs VO
+
+구분			|설명			|용도
+Entity			|DB 테이블과 매핑되는 클래스	|DB와 직접 연동
+DTO (Data Transfer Object)	|데이터를 옮기는 용도	|컨트롤러 ↔ 서비스 ↔ 화면 간 전달
+VO (Value Object)		|변경 불가능한 데이터 객체	|읽기 전용 or 불변 객체로 사용
+
+### Optional #
+- Optional은 null 대신 안전하게 값을 다루는 도구
+
+// tno(ID)를 기준으로 게시글을 조회하는 코드
+Optional<Board> result = boardRepository.findById(tno);
+
+// Optional은 값이 있을 수도 있고, 없을 수도 있기 때문에 존재 여부를 먼저 확인
+if (result.isPresent()) {
+
+    // 값이 존재하면 get()으로 실제 Board 객체 꺼내기
+    Board board = result.get();
+
+    // 게시글의 제목 출력 (이 시점에 board는 절대 null 아님)
+    System.out.println("제목: " + board.getTitle());
+
+} else {
+
+    // 값이 없으면 이 블록이 실행됨
+    System.out.println("해당 게시글을 찾을 수 없습니다.");
+
+}
