@@ -37,7 +37,7 @@ public class BoardRepositoryTests {
                     .writer("writer___" + (i%10))
                     .build();
             Board result = boardRepository.save(board);
-                // .save : DB에 반영하기
+                // .save : DB에 반영하기 => insert sql 문장과 결과 동일.
             //JpaRepository에서 확인하는 부분 ㅡㅡㅡㅡㅡㅡㅡㅡㅡ
             log.info("bno : " +result.getBno());
             //JpaRepository에서 확인하는 부분 ㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -82,6 +82,7 @@ public class BoardRepositoryTests {
     public void testPaging() {
         // 1 페이지에서, bno 기준으로 내림차순.
         Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
+                    // PageRequest.of(페이지번호, 사이즈크기, 정렬기준)
         // JpaRepository 이용해서 페이징처리 된 데이터 받기
         Page<Board> result = boardRepository.findAll(pageable);
 
