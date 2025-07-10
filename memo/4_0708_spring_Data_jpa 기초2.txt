@@ -108,7 +108,7 @@ select * from board b where b.name = #{id}
 
 QueryDSL
 DSL (Domain-Specific Language)
--> 자바 문법 -> SQL 이용한다.
+-> 자바 문법 만으로 SQL 이용한다.
 -> 동적으로 개발이 가능하고,
 -> 자바 빌더 패턴 형식으로 작성하니,
 -> 컴파일러의 문법 검사 기능의 도움을 받을수 있음.

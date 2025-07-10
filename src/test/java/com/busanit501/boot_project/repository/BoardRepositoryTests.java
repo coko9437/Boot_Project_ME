@@ -35,11 +35,12 @@ public class BoardRepositoryTests {
                     .content("content___" + i)
                     .writer("writer___" + (i%10))
                     .build();
+//====================== JpaRepository에서 확인 하는 부분은 여기==================================
             Board result = boardRepository.save(board);
-                // .save : DB에 반영하기 => insert sql 문장과 결과 동일.
+                // .save : DB에 반영하기 => insert sql 문장과 결과 동일. = 쿼리메서드임.
 //====================== JpaRepository에서 확인 하는 부분은 여기==================================
             log.info("bno : " +result.getBno());
-//====================== JpaRepository에서 확인 하는 부분은 여기==================================
+
 
         });
     } // 1 insert //

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="www.thymeleaf.org"
+      layout:decorate="~{layout/basic.html}"
+      lang="en"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>list화면</title>
+</head>
+<body>
+
+<!--    "content" 영역-->
+    <div layout:fragment="content">
+        <h1>Board List</h1>
+    </div>
+
+
+<!--    "script" 영역-->
+    <script layout:fragment="script" th:inline="javascript">
+        console.log("list.html의 자바스크립트 영역임.")
+    </script>
+
+</body>
+</html>

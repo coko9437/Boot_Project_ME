@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import java.util.List;
 
 // 인터페이스이름 + Impl => 이름 규칙임. 동일하게 작성해야함.
-    // QuerydslRepositorySupport 부모클래스. QueryDSL 사용하기위한 도구 함
+    // QuerydslRepositorySupport : 부모클래스. QueryDSL 사용하기위한 도구 함
 public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardSearch {
 
     public BoardSearchImpl() {
@@ -46,7 +46,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
         long count = query.fetchCount(); // 가져온 DB 데이터 갯수 확인.
 
         // 순서6
-            // 페이징 조건 추가해보기. 검색쿼리에 페이징조건 탑재
+            // 페이징 조건 추가해보기. getQuerydsl 에 페이징조건 탑재
         this.getQuerydsl().applyPagination(pageable,query);
 
         // 순서7
@@ -63,14 +63,14 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
     // 페이징정보 + 검색정보를 이용해서
         // 자바 메서드로 SQL 전달하기.
     @Override
-    public Page<Board> searchAll(String[] types, String keyword, Pageable pageable) {
-        // 순서 1.
+    public Page<Board> searchAll(String[] types, String keyword, Pageable pageable) { // pageable : 몇개씩 보여줄건지?
+        // 순서 1. 고정,
         QBoard board = QBoard.board; // board 정의.
 
-        // 순서 2.
+        // 순서 2. 고정,
         JPQLQuery<Board> query = from(board); // select * from board;
 
-        // 순서 3.
+        // 순서 3. 고정,
             // BooleanBuilder를 이용해서 조건 추가 (= where 조건절)
         if((types != null && types.length > 0 )&& keyword != null) {
 
@@ -94,13 +94,13 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
         query.where(board.bno.gt(0L)); // bno > 0 추가.
 
-        // 순서 4. paging 조건 추가하기.
+        // 순서 4. 고정, paging 조건 추가하기.
         this.getQuerydsl().applyPagination(pageable,query);
 
-        // 순서 5. 위 검색조건... SQL문 전달하기, 데이터 가져오기.
+        // 순서 5. 고정, 위 검색조건... SQL문 전달하기, 데이터 가져오기.
         List<Board> list = query.fetch();
 
-        // 순서 6.
+        // 순서 6. 고정, 데이터 가지고올때
         long count = query.fetchCount();
 
         // 순서 7. 리턴타입에 맞추기

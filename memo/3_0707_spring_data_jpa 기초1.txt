@@ -6,7 +6,7 @@ JPA(Java Persitence(영속성) API)
 ### JPA (Java Persitence(영속성) API)
 
 
-JPA(영속성 컨텍스트, 1차 캐시 테이블, 임시 테이블) <->  DB(실제 테이블)
+JPA(영속성 컨텍스트, 1차 캐시 테이블(임시 테이블) ) <->  DB(실제 테이블)
 : 동기화 놀이 할 예정.
 
 만약,
