@@ -73,6 +73,11 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.4.0'
     // 6 //
 
+    // 7
+    // Rest 테스트 도구 스웨거 설치.
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
+    // 7 //
+
 }
 
 tasks.named('test') {
