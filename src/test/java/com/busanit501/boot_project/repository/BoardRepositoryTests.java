@@ -1,6 +1,7 @@
 package com.busanit501.boot_project.repository;
 
 import com.busanit501.boot_project.domain.Board;
+import com.busanit501.boot_project.dto.BoardListReplyCountDTO;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +130,7 @@ public class BoardRepositoryTests {
         // 화면의 체크박스에서... "작성자","내용","제목"다 체크했다 가정.
         String[] types = {"t", "c", "w"};
             // 검색어
-        String keyword = "1";
+        String keyword = "97";
             // 페이징 정보
         Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
             // 실제 DB 가져오기 작업.
@@ -151,4 +152,32 @@ public class BoardRepositoryTests {
         log.info("디비에서 페이징된 조회될 데이터 10개 : todoList  : ");
         todoList.forEach(board -> log.info(board));
     } // 7. QueryDSL 확인, 자바문법으로 SQL 전달하기 2. //
+
+    // 기존 , 보드 정보 4가지에 이어서, 추가로 댓글 갯수 추가한 형태
+    @Test
+    public void testSearchReplyCount() {
+        // 검색시 사용할, 더미 데이터 준비물
+        // 1)
+        String[] types = {"t","c","w"};
+        //검색어
+        String keyword = "97";
+        // 페이징 정보,
+        Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
+
+        // 댓글 갯수가 포함된 데이터를 조회
+        Page<BoardListReplyCountDTO> result = boardRepository.searchWithReplyCount(types, keyword, pageable);
+        // 결과 값, 콘솔에서 확인.
+        log.info("전체 갯수 : total count : " + result.getTotalElements());
+        log.info("전체 페이지 : total pages : " + result.getTotalPages());
+        log.info("현재 페이지 번호 : page number  : " + result.getNumber());
+        log.info("보여줄 사이즈 크기 : page size  : " + result.getSize());
+        log.info("이전 페이지 유무 : " + result.hasPrevious());
+        log.info("다음 페이지 유무 : " + result.hasNext());
+        // 임시 리스트 생성해서, 디비에서 전달 받은 데이터를 담아두기.
+        List<BoardListReplyCountDTO> todoList = result.getContent();
+        log.info("디비에서 페이징된 조회될 데이터 10개 : todoList  : ");
+        todoList.forEach(board -> log.info(board));
+    }
+
+
 }

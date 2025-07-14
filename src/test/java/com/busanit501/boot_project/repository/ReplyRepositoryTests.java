@@ -1,0 +1,63 @@
+package com.busanit501.boot_project.repository;
+
+import com.busanit501.boot_project.domain.Board;
+import com.busanit501.boot_project.domain.Reply;
+import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+
+
+@SpringBootTest
+@Log4j2
+public class ReplyRepositoryTests {
+
+    @Autowired // ReplyRepository를 필드 이용하기
+    private ReplyRepository replyRepository;
+
+    @Test
+    public void testInsert() {
+        // 댓글 작성 테스트임.
+        // 준비물 :
+//            1) 실제 부모게시글이(board) 존재해야함.
+        Long bno = 104L;
+
+//            부모게시글 더미데이터
+        Board board = Board.builder()
+                .bno(bno)
+                .build();
+
+//            댓글의 더미데이터
+        Reply reply = Reply.builder()
+                // 부모게시글 객체는 반드시 필요함.
+                .board(board)
+                .replyText("샘플 게시글 내용3")
+                .replyer("샘플 댓글 작성자2")
+                .build();
+
+        // 실제 DB에 반영하기.
+        replyRepository.save(reply);
+
+    }
+
+    @Test
+    @Transactional // 엔티티 클래스에서, @ToString(exclude = "board")
+    // (exclude = "board") 제외시, 사용하기.
+    public void testBoardReplies() {
+        Long bno = 104L;
+        //페이징정보 담기.
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("rno").descending());
+        Page<Reply> result = replyRepository.listOfBoard(bno,pageable);
+        result.getContent().forEach(
+                reply -> {log.info("replyRepositoryTests, 조회된 댓글 확인." +reply);}
+        );
+
+    }
+
+}

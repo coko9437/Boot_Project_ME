@@ -2,7 +2,10 @@ package com.busanit501.boot_project.repository.search;
 
 import com.busanit501.boot_project.domain.Board;
 import com.busanit501.boot_project.domain.QBoard;
+import com.busanit501.boot_project.domain.QReply;
+import com.busanit501.boot_project.dto.BoardListReplyCountDTO;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -104,6 +107,74 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
         long count = query.fetchCount();
 
         // 순서 7. 리턴타입에 맞추기
+        return new PageImpl<>(list,pageable,count);
+    }
+
+    @Override
+    public Page<BoardListReplyCountDTO> searchWithReplyCount(String[] types, String keyword, Pageable pageable) {
+        // 순서 1. 고정,
+        QBoard board = QBoard.board; // board 정의.
+        QReply reply = QReply.reply; // reply 정의.
+
+        // 순서 2. 고정,
+        JPQLQuery<Board> query = from(board); // select * from board;
+
+        // 순서 3.
+        // left 조인 : 게시글 + 댓글을 합치기
+//            게시글의 댓글이 없는 경우도 표시하기위해 사용함.
+        query.leftJoin(reply).on(reply.board.eq(board));
+        query.groupBy(board);
+
+        // 순서 4.
+        // BooleanBuilder를 이용해서 조건 추가 (= where 조건절)
+        if((types != null && types.length > 0 )&& keyword != null) {
+
+            BooleanBuilder builder = new BooleanBuilder();
+            // BooleanBuilder -> OR / AND 조건을 사용하기 쉽다.
+            for(String type : types) {
+                // types : 배열임. { "t", "w", "c" }=> title, writer, content
+                switch (type) {
+                    case "t" : builder.or(board.title.contains(keyword));
+                        break;
+
+                    case "c" : builder.or(board.content.contains(keyword));
+                        break;
+
+                    case "w" : builder.or(board.writer.contains(keyword));
+                        break;
+                }
+            }
+            query.where(builder); // select * from board where like %keyword%;
+        }
+
+        query.where(board.bno.gt(0L)); // bno > 0 추가.
+
+
+
+        // 순서 5.
+            // DTO <-> Entity (VO) ... 서비스에서 모델 맵퍼 이용해서 변환했었음
+//            이번에는 자동으로 변환해보기.
+        JPQLQuery<BoardListReplyCountDTO> dtoQuery = query.select( // query에 옵션주기(select)
+                Projections.bean(BoardListReplyCountDTO.class, // Projections.bean을 이용해서
+                        board.bno,
+                        board.title,
+                        board.writer,
+                        board.regDate,
+                        reply.count().as("replyCount")
+                        ) //bean
+                ); //select,  board의 엔티티 클래스로 변환하겠다.
+
+        // 순서 6.
+            // 기존의 1) 페이징정보, 2) 검색정보 + 댓글의 갯수
+        // 페이징 적용하기.
+        this.getQuerydsl().applyPagination(pageable,dtoQuery);
+
+        // 순서 7.
+            // 실제 DB를 가져오는작업 (fetch)
+        List<BoardListReplyCountDTO> list = dtoQuery.fetch();
+        long count = dtoQuery.fetchCount();
+
+
         return new PageImpl<>(list,pageable,count);
     }
 }
