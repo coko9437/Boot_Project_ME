@@ -28,6 +28,15 @@ public class Reply extends BaseEntity{ //엔티티클래스 : DB와 직접 관�
 
     private String replyText; //댓글 내용
     private String replyer; // 댓글 작성자
+    // 보드 객체 수정하기.
+    public void changeBoard(Board board) {
+        this.board = board;
+    }
+    // 댓글 내용 수정하기
+    public void changeReplyText(String text) {
+        this.replyText = text;
+
+    }
 
 
 }

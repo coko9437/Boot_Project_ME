@@ -1,6 +1,7 @@
 package com.busanit501.boot_project.controller;
 
 import com.busanit501.boot_project.dto.ReplyDTO;
+import com.busanit501.boot_project.service.ReplyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -22,6 +24,7 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 public class ReplyController {
+    private final ReplyService replyService;
     // JSON 데이터 타입의 기본 모양, { "키" : 값, "키2":값2,... }
     // MIME 타입, -> MediaType.APPLICATION_JSON_VALUE
     //{
@@ -38,7 +41,8 @@ public class ReplyController {
     //@RequestBody ReplyDTO replyDTO : 화면으로부터 JSON형태의 데이터(문자열) 서버로 전달 -> 서버에서는 객체 형태로 변경해줌.(=역 직렬화)
     //ResponseEntity<Map<String,Long>> : 서버에서 화면으로 응답. 1) http status code, (200 OK) 2) 데이터 전달
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Long>> register(@Valid @RequestBody ReplyDTO replyDTO,
+//    public ResponseEntity<Map<String,Long>> register(@Valid @RequestBody ReplyDTO replyDTO,
+    public Map<String,Long> register( @Valid @RequestBody ReplyDTO replyDTO,
     BindingResult bindingResult) throws BindException {
         log.info("ReplyController에서 작업중, 댓글 작성 작업");
 
@@ -46,9 +50,19 @@ public class ReplyController {
             throw new BindException(bindingResult);
         }
 
-        log.info("replyDTO : " + replyDTO);
+        log.info("ReplyController에서 작업중 replyDTO : " + replyDTO);
         // 화면이 없어서, 하드코딩으로 더미 데이터 만들기.
-        Map<String,Long> resultMap = Map.of("rno",100L);
-        return ResponseEntity.ok(resultMap);
+//        Map<String,Long> resultMap = Map.of("rno",100L);
+
+        // 실제로 데이터를 받아서 DB에 저장하기!
+
+        Map<String,Long> resultMap = new HashMap<>();
+            Long rno = replyService.register(replyDTO);
+            resultMap.put("rno", rno);
+
+            return resultMap;
+//        return ResponseEntity.ok(resultMap);
     }
+
+
 }

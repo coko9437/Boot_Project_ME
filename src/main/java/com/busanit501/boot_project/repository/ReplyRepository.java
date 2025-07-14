@@ -11,4 +11,5 @@ public interface ReplyRepository extends JpaRepository<Reply,Long> {
                                 //- r.board는 Reply 엔티티가 참조하고 있는 Board 엔티티
                                 //- r.board.bno는 Board의 기본키(bno)
     Page<Reply> listOfBoard(Long bno, Pageable pageable);
+
 }

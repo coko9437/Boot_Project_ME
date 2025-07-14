@@ -11,7 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Rollback;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 @SpringBootTest
@@ -20,6 +23,8 @@ public class ReplyRepositoryTests {
 
     @Autowired // ReplyRepository를 필드 이용하기
     private ReplyRepository replyRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     @Test
     public void testInsert() {
@@ -50,14 +55,34 @@ public class ReplyRepositoryTests {
     @Transactional // 엔티티 클래스에서, @ToString(exclude = "board")
     // (exclude = "board") 제외시, 사용하기.
     public void testBoardReplies() {
-        Long bno = 104L;
-        //페이징정보 담기.
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("rno").descending());
-        Page<Reply> result = replyRepository.listOfBoard(bno,pageable);
-        result.getContent().forEach(
-                reply -> {log.info("replyRepositoryTests, 조회된 댓글 확인." +reply);}
-        );
+            Long bno = 104L;
+            //페이징정보 담기.
+            Pageable pageable = PageRequest.of(0, 10, Sort.by("rno").descending());
+            Page<Reply> result = replyRepository.listOfBoard(bno,pageable);
+            result.getContent().forEach(
+                    reply -> {log.info("replyRepositoryTests, 조회된 댓글 확인." +reply);}
+            );
 
+    }
+
+    // 댓글 더미데이터 만들기(100개)
+    @Test
+    @Transactional
+    @Rollback(false)
+    public void testInsertMany() {
+        Long bno = 104L;
+        Board board = boardRepository.findById(bno).orElseThrow();
+
+        List<Reply> replies = new ArrayList<>();
+
+        for (int i = 0; i < 100; i++) {
+            replies.add(Reply.builder()
+                            .board(board)
+                            .replyText("더미 댓글 내용 : " + i)
+                            .replyer("더미 유저 : " + i)
+                    .build());
+        }
+        replyRepository.saveAll(replies);
     }
 
 }
