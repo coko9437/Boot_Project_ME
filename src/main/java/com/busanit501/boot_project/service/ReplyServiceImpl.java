@@ -11,11 +11,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -32,15 +34,13 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public Long register(ReplyDTO replyDTO) {
-            log.info("ReplyServiceImpl, 화면으로부터 전달받은 데이터 확인" + replyDTO);
+        log.info("ReplyServiceImpl 에서, 화면으로 부터 전달 받은 데이터 확인 replyDTO: " + replyDTO);
         Reply reply = modelMapper.map(replyDTO, Reply.class);
-
         // 화면으로 부터 전달받은 데이터 bno 가 있고, 변환 되는 과정에서 해당 객체를 넣는 부분이 빠졌음.
         Optional<Board> result = boardRepository.findById(replyDTO.getBno());
-        Board board = result.orElseThrow(); // 여기까지 board 내용임.
-        reply.changeBoard(board); // 여기서 board의 내용(bno, title... ) 에다가 + reply 내용을 넣음.
-
-        log.info("ReplyServiceImpl, 화면으로부터 전달받은 데이터 확인" +  reply);
+        Board board = result.orElseThrow();
+        reply.changeBoard(board);
+        log.info("ReplyServiceImpl 에서, 화면으로 부터 전달 받은 데이터 확인2 reply: " + reply);
         Long rno = replyRepository.save(reply).getRno();
         return rno;
     }
@@ -80,6 +80,7 @@ public class ReplyServiceImpl implements ReplyService {
     //삭제
     @Override
     public void remove(Long rno) {
+        Reply reply = replyRepository.findById(rno).orElseThrow();
         replyRepository.deleteById(rno);
 
     }
@@ -87,7 +88,7 @@ public class ReplyServiceImpl implements ReplyService {
     // 페이징처리
     @Override
     public PageResponseDTO<ReplyDTO> getListofBoard(Long bno, PageRequestDTO pageRequestDTO) {
-// 페이징 준비문 준비,
+        // 페이징 준비물
         Pageable pageable = PageRequest.of(pageRequestDTO.getPage() <=0 ? 0 : pageRequestDTO.getPage()-1
                 , pageRequestDTO.getSize(), Sort.by("rno").ascending());
         // 조회 하기.
