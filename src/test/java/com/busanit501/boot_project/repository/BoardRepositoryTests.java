@@ -1,7 +1,9 @@
 package com.busanit501.boot_project.repository;
 
 import com.busanit501.boot_project.domain.Board;
+import com.busanit501.boot_project.domain.BoardImage;
 import com.busanit501.boot_project.dto.BoardListReplyCountDTO;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Commit;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @SpringBootTest
@@ -21,6 +25,11 @@ public class BoardRepositoryTests {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    // 추가-- 게시글 삭제시 댓글도 같이 삭제
+    @Autowired
+    private ReplyRepository replyRepository;
+
 
     // JpaRepository를 이용해서 기본CRUD 확인하기
         // SQL을 몰라도 자바의 메서드만 호출해서 SQL 전달하기.
@@ -179,5 +188,72 @@ public class BoardRepositoryTests {
         todoList.forEach(board -> log.info(board));
     }
 
+    // 첨부된 이미지(BoardImage) 포함해서 게시글(Board) 작성해보기.
+    @Test
+    public void testInsertWithImages() {
+        //더미데이터 만들기
+        Board board = Board.builder()
+                .title("첨부이미지 추가한 게시글")
+                .content("첨부파일 추가해서 게시글 작성 테스트임. ")
+                .writer("이상용")
+                .build();
 
+        // 더미데이터2 - 첨부이미지
+        for(int i=0; i<3; i++) {
+            board.addImage(UUID.randomUUID().toString(), "file" + i+".jpg");
+        }
+        boardRepository.save(board);
+    }
+
+    // Lazy 로딩 확인해보기.
+    // 게시글 하나 조회시, 여기에 첨부된 이미지들도 조회를 하는 부분,
+    @Test
+    @Transactional
+    public void testReadWithImages() {
+        // 실제로 존재하는 이미지가 있는 게시글 확인부터. (bno:107L)
+//        Optional<Board> result = boardRepository.findById(107L);  <<-- 각각 조회했음.
+        Optional<Board> result = boardRepository.findByIdWithImages(107L);
+        Board board = result.orElseThrow();
+            log.info("testReadWithImages, board 확인중. : " +board);
+//            log.info("testReadWithImages, board의 이미지들 확인 : " + board.getImageSet());
+        for(BoardImage boardImage : board.getImageSet()) {
+            log.info("첨부된 BoardImage 확인 :" + boardImage);
+                //보드레포지토리의 @EntityGraph로 쟁반에 담아서 출력. 1줄로 나오던거-> 3줄로.
+        }
+    }
+
+    //첨부된 이미지를 수정해보기. 고아 객체들의 처리 유무에 확인
+    @Test
+    @Transactional
+    @Commit
+    public void testModifyImage() {
+        // 게시글1 안에 첨부이미지(3개) img1.jpg/ img2.jpg/ img3.jpg
+            // 수정 -> 게시글1에 첨부이미지 변경 ==> test1.jpg/ test2.jpg/ test3.jpg
+        // 기존 첨부된 이미지 img1.jpg ...3개는??
+        // 실제 DB에도 기록이 된 상태지만
+            // 부모인 게시글1이 없어진상태 ... 첨부이미지? '고아객체'
+            // 스프링에서 고아객체? 가비지 컬렉션이 알아서 자동수거하게..
+        //실제 각자 DB에 있는 더미데이터로 확인해보기.
+
+        Optional<Board> result = boardRepository.findByIdWithImages(107L);
+        Board board = result.orElseThrow();
+
+        // 기존 보드에 첨부된이미지들을 클리어,
+            board.clearImages();
+        // 새로 첨부된 이미지들로 교체
+        for(int i=0; i<3; i++) {
+            board.addImage(UUID.randomUUID().toString(), "Update-file_1" + i + ".jpg");
+        }
+        boardRepository.save(board);
+    }
+
+    @Test
+    @Transactional
+    @Commit
+    public void testRemoveAll() {
+        // 실제로 삭제할 DB (107L)
+        replyRepository.deleteByBoard_Bno(107L);
+        boardRepository.deleteById(107L);
+
+    }
 }

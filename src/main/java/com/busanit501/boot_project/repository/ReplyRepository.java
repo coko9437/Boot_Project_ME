@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ReplyRepository extends JpaRepository<Reply,Long> {
+
     @Query("select r from Reply r where r.board.bno = :bno")
-                                //- r.board는 Reply 엔티티가 참조하고 있는 Board 엔티티
-                                //- r.board.bno는 Board의 기본키(bno)
     Page<Reply> listOfBoard(Long bno, Pageable pageable);
 
+    // 게시글 번호로, 댓글 삭제하기.
+    void deleteByBoard_Bno(Long bno);
 }
