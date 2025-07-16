@@ -1,10 +1,10 @@
 package com.busanit501.boot_project.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 // 엔티티 클래스를 이용해서 Maria DB에 테이블 생성.
 @Entity
@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor // 모든 매개변수 생성자
 @NoArgsConstructor // 디폴트 매개변수
-@ToString // 콘솔에 출력할때 자동으로 출력해주게
+@ToString(exclude = "imageSet") // 콘솔에 출력할때 자동으로 출력해주게
 
 public class Board extends BaseEntity {
 
@@ -23,6 +23,13 @@ public class Board extends BaseEntity {
     private String title;
     private String content;
     private String writer;
+
+    // 연간관계 설정1
+    @OneToMany(mappedBy = "board") // <- BoardImage의 board 변수를 가리킴 즉 외래키.
+                                        // 중간 테이블 없이 연간관계 설정할 수 있음.
+    @Builder.Default
+    private Set<BoardImage> imageSet  = new HashSet<>();
+
 
     // 불변성으로, 데이터를 직접 수정하지않고,
     // 변경하려는 필드를 , 따로 메서드로 분리해서 작업함.

@@ -383,7 +383,7 @@
             modifyModal.hide()
             modifyText.value = ""
             modifyReplyer.value = ""
-            // 댓글 수정 후, 맨 마지막 페이지 이동.
+            // 댓글 수정 후 첫페이지로.
             printReplies(page,size)
         }).catch(e => {
             alert("예외가 발생했습니다.")
@@ -395,7 +395,24 @@
         modifyModal.hide()
     },false)
 
+    // 삭제 이벤트 리스너 추가하기. 위에 있는 수정 리스너를 재사용.
+    // removeBtn
+    removeBtn.addEventListener("click", function (e) {
 
+        // 비동기 처리, reply.js 에서, removeReply 이용하기.
+        // 모달창 헤더 부분에, 댓글의 번호 rno 있음.
+        removeReply(replyHeader.innerHTML).then(result => {
+            alert(result.rno + "댓글 삭제 완료")
+            modifyModal.hide()
+            modifyText.value = ""
+            modifyReplyer.value = ""
+            // 댓글 삭제 후, 맨 첫 페이지 이동.
+            page = 1
+            printReplies(page,size)
+        }).catch(e => {
+            alert("예외가 발생했습니다.")
+        })
+    },false)
 
 
 

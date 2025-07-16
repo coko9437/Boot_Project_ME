@@ -62,14 +62,16 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     //수정
+    @Transactional
     @Override
     public void modify(ReplyDTO replyDTO) {
         log.info("ReplyServiceImpl 에서, modify ,데이터 확인 replyDTO: " + replyDTO);
         // 기존 댓글을 불러와서
         Reply reply = replyRepository.findById(replyDTO.getRno()).orElseThrow();
         log.info("ReplyServiceImpl 에서, modify ,데이터 확인2 reply: " + reply);
-        // 교체할 데이터로 교체 작업후
+        // 댓글을 교체할 데이터로 교체 작업후
         reply.changeReplyText(replyDTO.getReplyText());
+        // 댓글 작성자 변경
         reply.changeReplyText(replyDTO.getReplyer());
         // 교체 후 데이터 다시한번더 확인
         log.info("ReplyServiceImpl 에서, modify ,데이터 확인3 reply: " + reply);
