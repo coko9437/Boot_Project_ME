@@ -32,11 +32,17 @@ public class Reply extends BaseEntity{ //엔티티클래스 : DB와 직접 관�
     public void changeBoard(Board board) {
         this.board = board;
     }
+
     // 댓글 내용 수정하기
     public void changeReplyText(String text) {
         this.replyText = text;
-
     }
+
+    // 댓글 작성자도 수정하기.
+    public void changeReplyer(String replyer) {
+        this.replyer = replyer;
+    }
+
 
 
 }
